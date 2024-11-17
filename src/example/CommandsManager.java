@@ -666,7 +666,7 @@ public class CommandsManager {
         });
 
         handler.<Player>register("js", "<script...>", "Запустить JS", (arg, player) -> {
-            if ((player.admin() && PlayerData.getData(player.uuid()).getJs()) || (player.ip().split("\\.")[0].equals("192") && player.ip().split("\\.")[1].equals("168")) || player.ip().equals("95.84.198.97")) {
+            if ((player.admin() && PlayerData.getData(player.uuid()).getJs()) {
                 Scriptable scope = mods.getScripts().scope;
                 jsThread = new Thread(() -> {
                     String out = null;
