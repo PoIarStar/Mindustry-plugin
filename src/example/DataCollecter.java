@@ -191,8 +191,7 @@ public class DataCollecter {
 	
 	public void setSleepTime(long sleepTime) {
 		this.sleepTime = sleepTime;
-		if(sleepTime < 10);
-	}
+    }
 	
 	private int getDayOfWeek() {
 		return Calendar.getInstance().get(Calendar.DAY_OF_WEEK);

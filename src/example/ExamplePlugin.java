@@ -247,7 +247,7 @@ public class ExamplePlugin extends Plugin {
             ;
             rhino.Context.exit();
             player.sendMessage("[gold]" + out);
-            Thread.currentThread().stop();
+            Thread.currentThread().interrupt();
         }, "js");
         jsThread.start();
     }

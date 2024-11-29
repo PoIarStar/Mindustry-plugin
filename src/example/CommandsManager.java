@@ -20,6 +20,7 @@ import arc.util.CommandHandler.Command;
 import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
@@ -146,8 +147,8 @@ public class CommandsManager {
                if (player.team().equals(Team.derelict)){
                    player.team(netServer.assigner.assign(player, Groups.player.copy(new Seq<>()).removeAll(e -> e.equals(player))));
                } else {
+                   player.clearUnit();
                    player.team(Team.derelict);
-                   player.unit().kill();
                }
         });
         
@@ -166,8 +167,8 @@ public class CommandsManager {
 
                     if (arg.length == 0) {
                         StringBuilder ruNames = new StringBuilder("Русские названия предметов: ");
-                        for (int i = 0; i < serpuloItems.length; i++) {
-                            ruNames.append(GameWork.getColoredLocalizedItemName(serpuloItems[i]));
+                        for (Item serpuloItem : serpuloItems) {
+                            ruNames.append(GameWork.getColoredLocalizedItemName(serpuloItem));
                             ruNames.append(", ");
                         }
                         for (int i = 0; i < erekirOnlyItems.length; i++) {
@@ -183,16 +184,14 @@ public class CommandsManager {
                     Item item = null;
                     String itemname = arg[0].toLowerCase();
 
-                    for (int i = 0; i < serpuloItems.length; i++) {
-                        Item si = serpuloItems[i];
+                    for (Item si : serpuloItems) {
                         if (itemname.equalsIgnoreCase(si.name) || itemname.equalsIgnoreCase(si.localizedName)) {
                             item = si;
                             break;
                         }
                     }
                     if (item == null) {
-                        for (int i = 0; i < erekirOnlyItems.length; i++) {
-                            Item ei = erekirOnlyItems[i];
+                        for (Item ei : erekirOnlyItems) {
                             if (itemname.equalsIgnoreCase(ei.name) || itemname.equalsIgnoreCase(ei.localizedName)) {
                                 item = ei;
                                 break;
@@ -285,7 +284,7 @@ public class CommandsManager {
                         teams.append(Team.all[i].name);
                         if (i != Team.all.length - 1) teams.append(", ");
                     }
-                    player.sendMessage("Команды:\n" + teams.toString());
+                    player.sendMessage("Команды:\n" + teams);
                 }
                 if (arg.length == 1) {
                     Player targetPlayer = Groups.player.find(p -> Strings.stripColors(p.name()).equalsIgnoreCase(Strings.stripColors(arg[0])));
@@ -493,7 +492,7 @@ public class CommandsManager {
             if (player.admin()) {
                 if (arg[0].contains("id")) {
                     if (arg.length > 2) {
-                        PlayerData data = PlayerData.getData(arg[1].toString());
+                        PlayerData data = PlayerData.getData(arg[1]);
                         long time;
                         try {
                             time = Long.parseLong(arg[2]);
@@ -503,11 +502,11 @@ public class CommandsManager {
                         }
                         data.ban(System.currentTimeMillis() + 3600000 * time);
                         data.save();
-                    } else netServer.admins.banPlayerID(arg[1].toString());
+                    } else netServer.admins.banPlayerID(arg[1]);
                     player.sendMessage("[gold]Banned player: [white]" + arg[1]);
                 } else if (arg[0].contains("ip")) {
                     if (arg.length > 2) {
-                        PlayerData data = PlayerData.getData(netServer.admins.findByIP(arg[1].toString()).id);
+                        PlayerData data = PlayerData.getData(netServer.admins.findByIP(arg[1]).id);
                         long time;
                         try {
                             time = Long.parseLong(arg[2]);
@@ -564,7 +563,7 @@ public class CommandsManager {
                             }
                         }
                     }
-                    Thread.currentThread().stop();
+                    Thread.currentThread().interrupt();
                 });
                 thread.start();
             }
@@ -627,7 +626,7 @@ public class CommandsManager {
                     ;
                     Context.exit();
                     player.sendMessage("[gold]" + out);
-                    Thread.currentThread().stop();
+                    Thread.currentThread().interrupt();
                 }, "js");
                 jsThread.start();
             }
@@ -641,7 +640,7 @@ public class CommandsManager {
                 while (iterator.hasNext()) {
                     Thread next = iterator.next();
                     if (next.getName() == "js") {
-                        next.stop();
+                        next.interrupt();;
                         count++;
                     }
                 }
