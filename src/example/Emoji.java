@@ -33,7 +33,7 @@ public class Emoji {
     public static final char emojiOil = '\uf826';
     public static final char emojiCryofluid = '\uf825';
 
-    public static final char emojiAlert = '\u26a0';
+    public static final char emojiAlert = '⚠';
 
     public static final char[] oreBlocksEmoji = new char[]{
             emojiCopper,
