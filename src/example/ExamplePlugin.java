@@ -6,14 +6,15 @@ import static mindustry.Vars.*;
 import arc.Events;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Liquids;
 import mindustry.entities.units.BuildPlan;
+import mindustry.game.EventType;
 import mindustry.game.EventType.BlockBuildBeginEvent;
 import mindustry.game.EventType.BuildSelectEvent;
 import mindustry.game.EventType.GameOverEvent;
-import mindustry.game.EventType.PlayerChatEvent;
 import mindustry.game.EventType.PlayerJoin;
 import mindustry.game.EventType.Trigger;
 import mindustry.game.EventType.WorldLoadEndEvent;
@@ -22,8 +23,11 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
+import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.mod.Plugin;
+import mindustry.net.Administration;
+import mindustry.server.ServerControl;
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import rhino.NativeJavaObject;
 import rhino.Scriptable;
@@ -36,6 +40,7 @@ public class ExamplePlugin extends Plugin {
     public static DataCollecter dataCollect;
     public static CommandsManager commandsManager;
     public static MyMenu menu;
+    public static Administration.Config emeraldFix = new Administration.Config("skipemerald", "Меняет карту после победы на Emerald City", true);
 
     @Override
     public void init() {
@@ -75,6 +80,17 @@ public class ExamplePlugin extends Plugin {
 
         Events.on(WorldLoadEndEvent.class, e -> {
             commandsManager.stopSkipmapVoteSession();
+        });
+
+        Events.on(EventType.BlockDestroyEvent.class, _ -> {
+            if (!emeraldFix.bool()) return;
+            if (state.map.plainName().toLowerCase().contains("emerald_city")) {
+                Timer.schedule(() -> {
+                    if (!(Team.crux.cores().isEmpty() || Team.blue.cores().isEmpty())) return;
+                    Map map = maps.customMaps().random();
+                    ServerControl.instance.play(() -> world.loadMap(map, map.applyRules(ServerControl.instance.lastMode)));
+                }, 2);
+            }
         });
 
         Events.on(PlayerJoin.class, e -> {
