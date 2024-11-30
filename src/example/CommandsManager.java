@@ -644,7 +644,7 @@ public class CommandsManager {
                         count++;
                     }
                 }
-                player.sendMessage(String.format("[gold]Stopped @ JS threads", count));
+                player.sendMessage(Strings.format("[gold]Stopped @ JS threads", count));
             }
         });
 
