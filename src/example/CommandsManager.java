@@ -610,8 +610,7 @@ public class CommandsManager {
                     Context context = Context.enter();
                     try {
                         Object o = context.evaluateString(scope, arg[0], "console.js", 1);
-                        NativeJavaObject n = new NativeJavaObject();
-                        if (o instanceof NativeJavaObject)
+                        if (o instanceof NativeJavaObject n)
                             o = n.unwrap();
                         if (o == null)
                             o = "null";
